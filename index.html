@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html ng-app="Resume" ng-controller="ResumeCtrl">
+
+<head>
+	<title>RESUME</title>
+	<link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+	<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
+
+	<style type="text/css">
+		body {
+			font-family: 'Quicksand', sans-serif;
+		}
+		.eol {
+			white-space: pre;
+		}
+		
+		.skill-table th {
+			line-height: 30px;
+		}
+		
+		.projects-table {
+			margin: 2px 0px;
+			page-break-inside: avoid;
+		}
+		
+		.projects-table td,
+		.projects-table th {
+			padding: 2px 0px;
+			vertical-align: top;
+		}
+		
+		.projects-table td:nth-child(1),
+		.projects-table th:nth-child(1) {
+			text-align: right;
+			padding-right: 15px;
+			width: 200px;
+		}
+		
+		.page-header {
+			page-break-after: avoid;
+			page-break-inside: avoid;
+		}
+		
+		li,
+		p,
+		hr {
+			page-break-inside: avoid;
+		}
+		
+		.new-page {
+			page-break-before: always;
+		}
+
+		@media print and (-webkit-min-device-pixel-ratio:0) {
+			h1, h3 {
+				color: #2980b9 !important;
+				-webkit-print-color-adjust: exact;
+			}
+			a[href]:after {
+				content: none !important;
+			}
+		}
+		h1, h3 {
+			color: #2980b9;
+			font-family: 'Roboto Slab', serif;
+		}
+	</style>
+
+	<link href="https://fonts.googleapis.com/css?family=Roboto+Slab|Quicksand" rel="stylesheet">
+</head>
+
+<body>
+	<div class="container-fluid height100">
+		<div class="row height100">
+			<div class="col-sm-4 hidden-print height100 scroll">
+				<h3>Editor</h3>
+				<form>
+					<div class="form-group">
+						<label>Name</label>
+						<input type="text" class="form-control" ng-model="resume.name" placeholder="">
+					</div>
+					<div class="form-group">
+						<label>Status</label>
+						<input type="text" class="form-control" ng-model="resume.status" placeholder="">
+					</div>
+
+					<h4>
+						<a ng-click="hideExp=!hideExp">
+							<small class="glyphicon glyphicon-{{hideExp?'plus':'minus'}}"></small> Experience
+						</a>
+					</h4>
+					<div class="form-group" ng-repeat="e in resume.exp" ng-hide="hideExp">
+						<label><span ng-bind="'#'+($index+1)"></span> <button ng-click="resume.exp.splice($index, 1)" class="btn btn-danger btn-xs">Remove</button></label>
+						<div>
+							<input type="text" class="form-control" ng-model="e.at" placeholder="At">
+							<input type="text" class="form-control" ng-model="e.duration" placeholder="Duration">
+						</div>
+					</div>
+					<button type="button" ng-click="resume.exp.push({})" class="btn btn-default btn-xs" ng-hide="hideExp">Add</button>
+
+					<div class="checkbox">
+						<label>
+						<input type="checkbox" ng-model="resume.newPage['skill']"> Page break here
+					</label>
+					</div>
+
+					<h4>
+						<a ng-click="hideSkill=!hideSkill">
+							<small class="glyphicon glyphicon-{{hideSkill?'plus':'minus'}}"></small> Skills
+						</a>
+					</h4>
+					<div class="form-group" ng-repeat="e in resume.skill" ng-hide="hideSkill">
+						<label><span ng-bind="'#'+($index+1)"></span> <button ng-click="resume.skill.splice($index, 1)" class="btn btn-danger btn-xs">Remove</button></label>
+						<div>
+							<input type="text" class="form-control" ng-model="e.key" placeholder="Label">
+							<input type="text" class="form-control" ng-model="e.value" placeholder="Value">
+						</div>
+					</div>
+					<button type="button" ng-click="resume.skill.push({})" class="btn btn-default btn-xs" ng-hide="hideSkill">Add</button>
+
+					<div class="checkbox">
+						<label>
+						<input type="checkbox" ng-model="resume.newPage['proj']"> Page break here
+					</label>
+					</div>
+
+					<h4>
+						<a ng-click="hideProj=!hideProj">
+							<small class="glyphicon glyphicon-{{hideProj?'plus':'minus'}}"></small> Projects
+						</a>
+					</h4>
+					<button type="button" ng-click="resume.proj.unshift({})" class="btn btn-default btn-xs" ng-hide="hideProj">Add</button>
+					<div class="form-group" ng-repeat="e in resume.proj" ng-hide="hideProj">
+						<label><span ng-bind="'#'+($index+1)"></span> <button ng-click="resume.proj.splice($index, 1)" class="btn btn-danger btn-xs">Remove</button></label>
+						<div>
+							<input type="text" class="form-control" ng-model="e.duration" placeholder="Duration">
+							<input type="text" class="form-control" ng-model="e.project" placeholder="Project Title">
+							<input type="text" class="form-control" ng-model="e.organization" placeholder="Organization">
+							<input type="text" class="form-control" ng-model="e.tools" placeholder="Platforms/Tools">
+							<textarea class="form-control" ng-model="e.role" placeholder="Responsibility"></textarea>
+						</div>
+					</div>
+
+					<div class="checkbox">
+						<label>
+						<input type="checkbox" ng-model="resume.newPage['education']"> Page break here
+					</label>
+					</div>
+
+					<h4>
+						<a ng-click="hideEdu=!hideEdu">
+							<small class="glyphicon glyphicon-{{hideEdu?'plus':'minus'}}"></small> Education
+						</a>
+					</h4>
+					<div class="form-group" ng-repeat="e in resume.education" ng-hide="hideEdu">
+						<label><span ng-bind="'#'+($index+1)"></span> <button ng-click="resume.education.splice($index, 1)" class="btn btn-danger btn-xs">Remove</button></label>
+						<div>
+							<input type="text" class="form-control" ng-model="e.text" placeholder="">
+						</div>
+					</div>
+					<button type="button" ng-click="resume.education.push({})" class="btn btn-default btn-xs" ng-hide="hideEdu">Add</button>
+
+					<br>
+					<button type="submit" ng-click="showJson=!showJson" class="btn btn-default">Save Json</button>
+					<button type="submit" ng-click="loadJson?load(newJson):loadJson=true" class="btn btn-default">Load Json</button>
+					<textarea ng-if="showJson" class="form-control" ng-bind="resume|json"></textarea>
+					<textarea ng-show="loadJson" class="form-control" ng-model="newJson"></textarea>
+				</form>
+			</div>
+
+			<div class="col-sm-8 height100 scroll">
+
+				<div class="page-header">
+					<div class="pull-right text-right" style="margin-top:-18px">
+						<img src="./call.png" height="60px" width="60px">
+						<p class="small text-muted">Scan QR to call</p>	
+						<!-- GENERATE QR USING: http://qrcode.tec-it.com/en/phone -->
+					</div>
+					<h1 ng-bind-html="resume.name" style="margin-bottom: 0px;"></h1>
+					<small ng-bind-html="resume.contact"></small>
+				</div>
+				<p ng-bind-html="resume.status"></p>
+
+				<h3 class="page-header">Overall Work Experience</h3>
+				<ul>
+					<li ng-repeat="e in resume.exp">
+						<span ng-bind-html="e.at"></span><br>
+						<span ng-bind-html="e.duration"></span>
+					</li>
+				</ul>
+
+				<h3 class="page-header" ng-class="{'new-page':resume.newPage['skill']}">Professional Skills</h3>
+				<table border="0" width="100%" class="skill-table">
+					<col width="200">
+					<tr ng-repeat="s in resume.skill">
+						<th ng-bind-html="s.key"></th>
+						<td ng-bind-html="s.value"></td>
+					</tr>
+				</table>
+
+				<h3 class="page-header" ng-class="{'new-page':resume.newPage['proj']}">Recent Projects</h3>
+				<table border="0" width="100%" ng-repeat="p in resume.proj" class="projects-table">
+					<tr>
+						<td>
+							<u ng-bind-html="p.duration"></u>
+						</td>
+						<td></td>
+					</tr>
+					<tr>
+						<th>
+							<u>Project</u>
+						</th>
+						<th>
+							<u ng-bind-html="p.project"></u>
+						</th>
+					</tr>
+					<tr>
+						<td>Organization</td>
+						<td ng-bind-html="p.organization"></td>
+					</tr>
+					<tr>
+						<td>Platforms/Tools</td>
+						<td ng-bind-html="p.tools" class=""></td>
+					</tr>
+					<tr>
+						<td>Responsibility</td>
+						<td ng-bind-html="p.role"></td>
+					</tr>
+				</table>
+
+				<h3 class="page-header" ng-class="{'new-page':resume.newPage['education']}">Education Qualification</h3>
+				<ul>
+					<li ng-repeat="e in resume.education" ng-bind-html="e.text"></li>
+				</ul>
+
+				<h3 class="page-header">Web Profiles</h3>
+				<table border="0" class="projects-table">
+					<tr>
+						<th>Skype</th>
+						<td>kanaksinghalis@gmail.com</td>
+					</tr>
+					<tr>
+						<th>Stack Overflow</th>
+						<td><a target="_blank" href="http://stackoverflow.com/users/3666966/kanak-singhal">http://stackoverflow.com/users/3666966/kanak-singhal</a></td>
+					</tr>
+					<tr>
+						<th>Linked In</th>
+						<td><a target="_blank" href="https://www.linkedin.com/in/kanak-singhal-367634b4">https://www.linkedin.com/in/kanak-singhal-367634b4</a></td>
+					</tr>
+				</table>
+
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		angular.module("Resume", [])
+			.config(function($sceProvider) {
+				// Completely disable SCE.  For demonstration purposes only!
+				// Do not use in new projects or libraries.
+				$sceProvider.enabled(false);
+			})
+			.controller("ResumeCtrl", function ($scope) {
+				$scope.resume = {
+					"name": "Kanak Singhal",
+					"contact": "Jodhpur, Rajasthan, India | M: +91 8233335484 | E: kanaksinghalis@gmail.com",
+					"status": "Three years of experience in <b>full-stack web and hybrid mobile application development</b> with the most trending technologies.",
+					"exp": [
+						{
+							"at": "Working at CG Technosoft, Jodhpur as <b>Engineer level- III</b>",
+							"duration": "From September 2015 till now"
+						},
+						{
+							"at": "Worked at DMatics Technologies, Jodhpur as Lead Software Engineer",
+							"duration": "From Jun 2014 - August 2015"
+						}
+					],
+					"skill": [
+						{
+							"key": "Languages",
+							"value": "<b>JavaScript</b>, Java, PHP, C++"
+						},
+						{
+							"key": "Technologies",
+							"value": "<b>Node.js</b>, JSP, Servlets"
+						},
+						{
+							"key": "Client-Side Technologies",
+							"value": "<b>JavaScript, AngularJs, Bootstrap</b>, ReactJs, Jquery, HTML5, CSS3."
+						},
+						{
+							"key": "Frameworks",
+							"value": "<b>ExpressJs (Node.js), AngularJs(front-end JS),</b> ionic (mobile apps), Yii2 (PHP)"
+						},
+						{
+							"key": "Database Platforms",
+							"value": "<b>ElasticSearch, MongoDB, MySQL</b>"
+						},
+						{
+							"key": "Development Tool",
+							"value": "VS Code, Eclipse, Sublime Text"
+						},
+						{
+							"key": "OS Platforms",
+							"value": "Windows 10, Linux - Ubuntu, Mint"
+						},
+						{
+							"key": "Management Tool",
+							"value": "Trello, Asana, Jira"
+						},
+						{
+							"key": "Servers",
+							"value": "<b>AWS cloud, Heroku</b>, Hostgator, Godaddy"
+						},
+						{
+							"key": "Repository Manager",
+							"value": "Github, BitBucket"
+						}
+					],
+					"proj": [
+						{
+							"duration": "Jan 2017 - Ongoing",
+							"project": "Teamistry - Team building app",
+							"organization": "CG Technosoft Pvt. Ltd.",
+							"tools": "Ionic2, Angular2, NodeJs, ExpressJs, MongoDB",
+							"role": "To develop an app that helps HRM, with tasks of organizing team-building activities. Features Team isolation, Commonality between co-workers, Lunch Roulette, etc."
+						},
+						{
+							"duration": "Oct 2016 - Dec 2016",
+							"project": "Configuration Management Server",
+							"organization": "CG Technosoft Pvt. Ltd.",
+							"tools": "AngularJs, Java",
+							"role": "Feature development: \"Advance query builder\" this enables user to create complicated filter queries using AI based smart suggestions for selecting fields, values and operations. And an algorithm to evaluate the query and filter records securely both on server and client side."
+						},
+						{
+							"duration": "Dec 2015 - Sep 2016",
+							"project": "ShopNearBy - Location based online shoppning app",
+							"organization": "CG Technosoft Pvt. Ltd.",
+							"tools": "MEAN stack, ElasticSearch, Bootstrap, AWS cloud technologies and ionic framework for mobile app.",
+							"role": "Assemble big data from different retailers and integrate them to one application. Scheduled fetching and integration, Search optimization and location based filtering of products, user analytics based auto complete, AWS Server architecture for running servers and bots in multiple environments."
+						},
+						{
+							"duration": "Nov 2015 - Dec 2015",
+							"project": "Tracking Genie Server",
+							"organization": "CG Technosoft Pvt. Ltd.",
+							"tools": "Java, MongoDB",
+							"role": "Create a TCP based Java non-blocking I/O (NIO) Server which is able to receive data from tracking devices being installed on vehicles. Compute the data received to form information, take necessary action like send SMS/Email alerts, acknowledged the device, etc."
+						},
+						{
+							"duration": "Sept 2015 - Nov 2015",
+							"project": "Tracking Genie - Vehicle tracking and fleet management system",
+							"organization": "CG Technosoft Pvt. Ltd.",
+							"tools": "PHP (Yii2), JavaScript, Google Maps, MongoDB",
+							"role": "Platform to enable users to view live tracking and replay saved tracking of their vehicles, with elegant UI and tracking animations showing alert status, speed and other information throughout the path on the map, various reports to summarize the events based on the given time difference."
+						},
+						{
+							"duration": "Jan 2015 - Aug 2015",
+							"project": "MyFoodGuy - Online food delivery System",
+							"organization": "DMatics Technologies.",
+							"tools": "PHP, MySQL, AngularJs",
+							"role": "To create efficient APIs for web and android use. And to create back-end caching system that is able to cache the most trending restaurants and their menu in a city, serving large scale e-commerce user base in minimum response time and minimum resource consumption"
+						}
+					],
+					"education": [
+						{
+							"text": "Bachelor of Engineering, Computer Science, JIET (RTU), Jodhpur - 64.96%"
+						}
+					],
+					"newPage": {
+						"education": true
+					}
+				}
+
+				$scope.load = function (newJson) {
+					$scope.loadJson = false;
+					if (newJson)
+						$scope.resume = JSON.parse(newJson);
+				}
+			})
+	</script>
+</body>
+
+</html>
